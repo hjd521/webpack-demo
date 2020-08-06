@@ -3,7 +3,7 @@
 * 1:定义webpack环境-process.env.NODE_ENV做一些特别的配置，开发时候更好的体验，生产环境更小的体积。使用
 ```
 new webpack.DefinePlugin({
-            'process.env.NODE_ENV': JSON.stringify('production')
+    'process.env.NODE_ENV': JSON.stringify('production')
 })
 ```
 * 2：使用tree-shaking去掉无效的es6模块化代码,当我们用到了一个库，但是我们只用了其中的一个方法。我们打包时候就不必把全部代码都打包。
@@ -66,4 +66,49 @@ const OptimizeCssAssetsPlugin =  require('optimize-css-assets-webpack-plugin')
 externals: {
    jquery: 'jQuery'
 }
+```
+* 7：启用gzip压缩，减少资源请求时间
+```
+const CompressPlugin = require('compression-webpack-plugin')
+new CompressPlugin(
+    {
+        test: /\.js$|\.html$/,
+        threshold: 10240,
+        deleteOriginalAssets: false
+    }
+),
+```
+* 8: 启用scope hoistiong（作用域提升）。
+```
+const webpack = require('webpack')
+new webpack.optimize.ModuleConcatenationPlugin()
+```
+
+* 9: 合并动态加载的体积较小的chunk，减少http链接次数
+```
+const webpack = require('webpack')
+new webpack.optimize.LimitChunkCountPlugin({
+                    maxChunks: 5
+                }),
+                // 合并小于1600的chunk
+                new webpack.optimize.MinChunkSizePlugin({
+                    minChunkSize: 1000 // Minimum number of characters
+})
+```
+* 10: ui库的按需加载，比如element
+```
+//babel.config.js
+momdule.exports = {
+    plugins: [
+       [
+            "component",
+            {
+                "libraryName": "element-ui",
+                "styleLibraryName": "theme-chalk"
+            },
+            'element-ui'
+        ] 
+    ]
+}
+
 ```
